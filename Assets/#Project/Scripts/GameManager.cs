@@ -28,4 +28,7 @@ public class GameManager : MonoBehaviour
     {
         // want to check position of each enemy. Need a for over an array for that
     }
+
+    //with timer IEnum, spawn cubes from pool, add them to active enemy list
+    //check cubes location vs camera, and despawn them.
 }
