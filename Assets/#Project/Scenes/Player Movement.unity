@@ -132,11 +132,7 @@ PrefabInstance:
       value: Game Initializer
       objectReference: {fileID: 0}
     - target: {fileID: 9074952551219772590, guid: 4284d264e974fbb499877a52fcee80c2, type: 3}
-      propertyPath: cooldown
-      value: 0.1
-      objectReference: {fileID: 0}
-    - target: {fileID: 9074952551219772590, guid: 4284d264e974fbb499877a52fcee80c2, type: 3}
-      propertyPath: batchNumber
+      propertyPath: velocity
       value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 9181618954702097953, guid: 4284d264e974fbb499877a52fcee80c2, type: 3}

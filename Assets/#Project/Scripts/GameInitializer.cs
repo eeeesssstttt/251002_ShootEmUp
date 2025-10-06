@@ -1,25 +1,35 @@
-using System;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 
 public class GameInitializer : MonoBehaviour
 {
     [Header("Camera")]
-    [SerializeField] CameraManager cameraManager;
-    [SerializeField] Vector3 camPosition;
-    [SerializeField] Quaternion camRotation;
+    [SerializeField] private CameraManager cameraManager;
+    [SerializeField] private Vector3 camPosition;
+    [SerializeField] private Quaternion camRotation;
+    [SerializeField] private float cameraDistance = 20f;
+
+    [Header("Controls")]
+    [SerializeField] private InputActionAsset actions;
 
     [Space]
     [Header("Spawner")]
-    [SerializeField] Spawner spawner;
-    [SerializeField] float forwardSpawn = 20f;
-    [SerializeField] EnemyBehavior enemyPrefab;
-    [SerializeField] int batchNumber;
-    [SerializeField] float cooldown;
+    [SerializeField] private Spawner spawner;
+    [SerializeField] private EnemyBehavior enemyPrefab;
+    [SerializeField] private int batchNumber = 10;
+    [SerializeField] private float enemySpawnCooldown = 0.1f;
+
+    [Space]
+    [Header("Player")]
+    [SerializeField] private PlayerBehavior player;
+    [SerializeField] private int lifePoints = 3;
+    [SerializeField] private float playerHitCooldown = 1f;
+    [SerializeField] private float velocity = 1f;
 
     [Space]
     [Header("Game Manager")]
-    [SerializeField] GameManager gameManager;
+    [SerializeField] private GameManager gameManager;
 
 
     void Start()
@@ -32,16 +42,17 @@ public class GameInitializer : MonoBehaviour
     private void CreateObjects()
     {
         cameraManager = Instantiate(cameraManager);
+        player = Instantiate(player);
         spawner = Instantiate(spawner);
         gameManager = Instantiate(gameManager);
     }
 
     private void InitializeObjects()
     {
-        cameraManager.Initialize(camPosition, camRotation);
-        (Vector3 min, Vector3 max) = cameraManager.GetRightBorderPoints(forwardSpawn);
+        cameraManager.Initialize(camPosition, camRotation, cameraDistance);
+        (Vector3 min, Vector3 max) = cameraManager.GetRightBorderPoints();
+        player.Initialize(actions, gameManager, cameraManager.GetCenter(), lifePoints, velocity);
         spawner.Initialize(enemyPrefab, min, max, batchNumber);
-        gameManager.Initialize(spawner, cooldown);
+        gameManager.Initialize(cameraManager, player, playerHitCooldown, spawner, enemySpawnCooldown);
     }
-
 }

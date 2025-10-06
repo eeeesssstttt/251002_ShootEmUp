@@ -47,9 +47,12 @@ MonoBehaviour:
   cameraManager: {fileID: 7993738462967284388, guid: af80ed5ef5b83a34a9d844cdf316c17b, type: 3}
   camPosition: {x: 0, y: 0, z: 0}
   camRotation: {x: 0, y: 0, z: 0, w: 0}
+  cameraDistance: 20
+  actions: {fileID: -944628639613478452, guid: 7577ae6e808a6104f842ba7525036a10, type: 3}
   spawner: {fileID: 1389250101968221411, guid: 6d79de3300c507140ac3c151754a7bd8, type: 3}
-  forwardSpawn: 20
   enemyPrefab: {fileID: 5998481921579256087, guid: 038a04cf2b0ec3e4b91007e657aec4b0, type: 3}
   batchNumber: 10
   cooldown: 0.1
+  player: {fileID: 1049109099146983418, guid: 69d6926b2e8e78543bad6c50f8bc1e6a, type: 3}
+  velocity: 1
   gameManager: {fileID: 1301237844255271627, guid: ed3e3489881646a40bd0482cebbb3aac, type: 3}

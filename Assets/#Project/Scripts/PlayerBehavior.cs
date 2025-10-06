@@ -1,21 +1,60 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 
+[RequireComponent(typeof(Collider))]
+
 public class PlayerBehavior : MonoBehaviour
 {
-    [SerializeField] private InputActionAsset actions;
+    private InputActionAsset actions;
     private InputAction xAxis;
     private InputAction yAxis;
-    [SerializeField] private float velocity = 1f;
-    private Camera cam;
-    // private Vector3 screenBottomLeft;
-    // private Vector3 screenBottomRight;
-    // private Vector3 screenTopLeft;
-    // private Vector3 screenTopRight;
-    private float minX;
-    private float maxX;
-    private float minY;
-    private float maxY;
+    private GameManager manager;
+    private Collider collider;
+    private int lifePoints;
+    private float velocity;
+
+    public void Initialize(InputActionAsset actions, GameManager manager, Vector3 position, int lifePoints, float velocity)
+    {
+        this.actions = actions;
+        xAxis = this.actions.FindActionMap("PlayerControls").FindAction("XAxis");
+        yAxis = this.actions.FindActionMap("PlayerControls").FindAction("YAxis");
+
+        this.manager = manager;
+
+        this.collider = GetComponent<Collider>();
+
+        SetPosition(position);
+
+        this.lifePoints = lifePoints;
+        this.velocity = velocity;
+
+        gameObject.SetActive(true);
+    }
+
+    void OnEnable()
+    {
+        actions.FindActionMap("PlayerControls").Enable();
+    }
+
+    void OnDisable()
+    {
+        actions.FindActionMap("PlayerControls").Disable();
+    }
+
+    public void Process()
+    {
+        Move();
+    }
+
+    public Vector3 GetExtents()
+    {
+        return collider.bounds.extents;
+    }
+
+    private void SetPosition(Vector3 position)
+    {
+        transform.position = position;
+    }
 
     private void Move()
     {
@@ -23,28 +62,19 @@ public class PlayerBehavior : MonoBehaviour
         transform.position += yAxis.ReadValue<float>() * velocity * Time.deltaTime * Vector3.up;
     }
 
-    private void Start()
+    public void Die()
     {
-        cam = Camera.main;
-        minX = cam.ScreenToWorldPoint(Vector3.zero + Vector3.forward * cam.nearClipPlane)[0];
-        maxX = cam.ScreenToWorldPoint(Vector3.zero + Vector3.right * cam.pixelWidth + Vector3.forward * cam.nearClipPlane)[0];
-        minY = cam.ScreenToWorldPoint(Vector3.zero + Vector3.forward * cam.nearClipPlane)[1];
-        maxY = cam.ScreenToWorldPoint(Vector3.zero + Vector3.up * cam.pixelHeight + Vector3.forward * cam.nearClipPlane)[1];
-
-
-        Debug.Log($"{minX}, {maxX}, {minY}, {maxY}");
-        // screenBottomLeft = cam.ScreenToWorldPoint(new Vector3(0, 0, cam.nearClipPlane));
-        // screenBottomRight = cam.ScreenToWorldPoint(new Vector3(cam.pixelWidth, 0, cam.nearClipPlane));
-        // screenTopLeft = cam.ScreenToWorldPoint(new Vector3(0, cam.pixelHeight, cam.nearClipPlane));
-        // screenTopRight = cam.ScreenToWorldPoint(new Vector3(cam.pixelWidth, cam.pixelHeight, cam.nearClipPlane));
-
-        xAxis = actions.FindActionMap("PlayerControl").FindAction("XAxis");
-        yAxis = actions.FindActionMap("PlayerControl").FindAction("YAxis");
+        gameObject.SetActive(false);
     }
 
-    private void Update()
+    public void ResetPlayer(Vector3 position)
     {
-        Move();
+        SetPosition(position);
+        gameObject.SetActive(true);
+    }
 
+    private void OnCollisionEnter(Collision collision)
+    {
+        manager.PlayerHit();
     }
 }

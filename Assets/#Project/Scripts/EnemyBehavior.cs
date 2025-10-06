@@ -29,7 +29,6 @@ public class EnemyBehavior : MonoBehaviour, IPoolClient
 
     void OnBecameInvisible()
     {
-        manager.EnemyLeaveGame(this);
+        manager.EnemyOffScreen(this);
     }
-
 }

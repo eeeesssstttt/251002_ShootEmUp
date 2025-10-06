@@ -12,6 +12,8 @@ public class Spawner : MonoBehaviour
         this.maxPoint = maxPoint;
 
         pool = new(enemy.gameObject, batchNumber);
+
+        gameObject.SetActive(true);
     }
 
     public EnemyBehavior Spawn()
