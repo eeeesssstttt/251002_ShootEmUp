@@ -1,34 +1,42 @@
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AI;
 
 public class GameManager : MonoBehaviour
 {
-    private Camera cam;
-    private Vector3 screenBottomLeft;
-    private Vector3 screenBottomRight;
-    private Vector3 screenTopLeft;
-    private Vector3 screenTopRight;
-    private List<EnemyBehavior> activeEnemies;
-    private Pool<EnemyBehavior> pool;
-    private Queue<EnemyBehavior> inactiveEnemies;
-    public void Initialize(Pool<EnemyBehavior> pool, Queue<EnemyBehavior> enemies)
-    {
-        cam = Camera.main;
-        screenBottomLeft = cam.ScreenToWorldPoint(new Vector3(0, 0, cam.nearClipPlane));
-        screenBottomRight = cam.ScreenToWorldPoint(new Vector3(cam.pixelWidth, 0, cam.nearClipPlane));
-        screenTopLeft = cam.ScreenToWorldPoint(new Vector3(0, cam.pixelHeight, cam.nearClipPlane));
-        screenTopRight = cam.ScreenToWorldPoint(new Vector3(cam.pixelWidth, cam.pixelHeight, cam.nearClipPlane));
+    private Spawner spawner;
+    private List<EnemyBehavior> enemies = new();
+    private float cooldown;
+    private float chrono = 0f;
 
-        this.pool = pool;
-        this.activeEnemies = new();
-        this.inactiveEnemies = enemies;
+    public void Initialize(Spawner spawner, float cooldown)
+    {
+        this.spawner = spawner;
+        this.cooldown = cooldown;
     }
 
-    public void Update()
+    private void Update()
     {
-        // want to check position of each enemy. Need a for over an array for that
+        chrono += Time.deltaTime;
+        if (chrono >= cooldown)
+        {
+            chrono = 0f;
+            EnemyBehavior enemy = spawner.Spawn();
+            if (!enemies.Contains(enemy))
+            {
+                enemies.Add(enemy);
+                enemy.Initialize(this);
+            }
+        }
+
+        for (int index = 0; index < enemies.Count; index++)
+        {
+            enemies[index].Process();
+        }
     }
 
-    //with timer IEnum, spawn cubes from pool, add them to active enemy list
-    //check cubes location vs camera, and despawn them.
+    public void EnemyLeaveGame(EnemyBehavior enemy)
+    {
+        spawner.DeSpawn(enemy);
+    }
 }

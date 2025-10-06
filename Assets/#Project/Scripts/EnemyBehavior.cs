@@ -2,28 +2,34 @@ using UnityEngine;
 
 public class EnemyBehavior : MonoBehaviour, IPoolClient
 {
-    private float velocity = 1f;
+    public bool Alive => gameObject.activeInHierarchy;
+    [SerializeField] Vector3 speed = Vector3.left * 10f;
 
-    // Ideally, would set velocity in GameInitializer, and give it to GameManager or Pool.
-
-    public void Appear(Vector3 position, Quaternion rotation)
+    private GameManager manager;
+    public void Rise(Vector3 position, Quaternion rotation)
     {
         gameObject.SetActive(true);
-        transform.SetPositionAndRotation(position, rotation);
+        transform.SetLocalPositionAndRotation(position, rotation);
     }
 
-    public void Disappear()
+    public void Initialize(GameManager manager)
+    {
+        this.manager = manager;
+    }
+    public void Fall()
     {
         gameObject.SetActive(false);
     }
 
-    // public void SetVelocity(float velocity)
-    // {
-    //     this.velocity = velocity;
-    // }
-
-    public void MoveRightToLeft()
+    public void Process()
     {
-        transform.position += velocity * Time.deltaTime * Vector3.left;
+        if (!Alive) return;
+        transform.Translate(speed * Time.deltaTime);
     }
+
+    void OnBecameInvisible()
+    {
+        manager.EnemyLeaveGame(this);
+    }
+
 }

@@ -1,45 +1,46 @@
-using System;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class Pool<T>
 where T : IPoolClient
 {
-    private int batch;
     private GameObject prefab;
+    private int batchNumber;
     private Queue<T> queue = new();
-
-    public Queue<T> CreateBatch(GameObject prefab, int batch = 10)
+    public Pool(GameObject prefab, int batchNumber)
     {
-        this.prefab = prefab;
-        for (int _ = 0; _ < batch; _++)
+        if (prefab.GetComponent<IPoolClient>() == null)
         {
-            GameObject go = GameObject.Instantiate(prefab);
-            if (go.TryGetComponent(out T client))
-            // I would like to verify this elsewhere at some point. 
-            // Instantiation only seems to work if I give the GameInitializer a GameObject rather than an EnemyBehavior.
-            {
-                Add(client);
-            }
-            else
-            {
-                throw new ArgumentException("Prefab does not have an IPoolClient component");
-            }
+            throw new System.ArgumentException("Prefab doesn't have a componenent that have implement IPoolClient");
         }
-        return queue;
+
+        this.prefab = prefab;
+        this.batchNumber = batchNumber;
+
+        CreateBatch();
+    }
+
+    private void CreateBatch()
+    {
+        for (int _ = 0; _ < batchNumber; _++)
+        {
+            GameObject go = Object.Instantiate(prefab);
+            T client = go.GetComponent<T>();
+            Add(client);
+        }
+    }
+
+    public T Get(Vector3 position, Quaternion rotation)
+    {
+        if (queue.Count == 0) CreateBatch();
+        T client = queue.Dequeue();
+        client.Rise(position, rotation);
+        return client;
     }
 
     public void Add(T client)
     {
         queue.Enqueue(client);
-        client.Disappear();
-    }
-
-    public T Get(Vector3 position, Quaternion rotation)
-    {
-        if (queue.Count == 0) CreateBatch(prefab);
-        T client = queue.Dequeue();
-        client.Appear(position, rotation);
-        return client;
+        client.Fall();
     }
 }

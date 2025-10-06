@@ -1,30 +1,47 @@
-using System.Collections.Generic;
+using System;
 using UnityEngine;
+
 
 public class GameInitializer : MonoBehaviour
 {
-    [SerializeField] private GameManager gameManager;
-    [SerializeField] private EnemyBehavior enemyPrefab;
-    // [SerializeField] private float velocity = 1f;
-    private Queue<EnemyBehavior> enemies;
-    [SerializeField] private float enemyVelocity = 1f;
-    private Pool<EnemyBehavior> pool;
+    [Header("Camera")]
+    [SerializeField] CameraManager cameraManager;
+    [SerializeField] Vector3 camPosition;
+    [SerializeField] Quaternion camRotation;
 
-    private void Start()
+    [Space]
+    [Header("Spawner")]
+    [SerializeField] Spawner spawner;
+    [SerializeField] float forwardSpawn = 20f;
+    [SerializeField] EnemyBehavior enemyPrefab;
+    [SerializeField] int batchNumber;
+    [SerializeField] float cooldown;
+
+    [Space]
+    [Header("Game Manager")]
+    [SerializeField] GameManager gameManager;
+
+
+    void Start()
     {
         CreateObjects();
         InitializeObjects();
+        Destroy(gameObject);
     }
 
     private void CreateObjects()
     {
+        cameraManager = Instantiate(cameraManager);
+        spawner = Instantiate(spawner);
         gameManager = Instantiate(gameManager);
-        pool = new Pool<EnemyBehavior>();
     }
 
     private void InitializeObjects()
     {
-        enemies = pool.CreateBatch(enemyPrefab.gameObject);
-        gameManager.Initialize(pool, enemies);
+        cameraManager.Initialize(camPosition, camRotation);
+        (Vector3 min, Vector3 max) = cameraManager.GetRightBorderPoints(forwardSpawn);
+        spawner.Initialize(enemyPrefab, min, max, batchNumber);
+        gameManager.Initialize(spawner, cooldown);
     }
+
 }

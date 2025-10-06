@@ -2,6 +2,6 @@ using UnityEngine;
 
 public interface IPoolClient
 {
-    void Appear(Vector3 position, Quaternion rotation);
-    void Disappear();
+    public void Rise(Vector3 position, Quaternion rotation);
+    public void Fall();
 }
