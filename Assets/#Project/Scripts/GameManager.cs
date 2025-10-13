@@ -9,19 +9,24 @@ public class GameManager : MonoBehaviour
     private float screenRight;
     private float screenBottom;
     private float screenTop;
+
+
     private PlayerBehavior player;
     private float playerHalfExtentX;
     private float playerHalfExtentY;
-    private float playerHitCooldown;
+    private float playerDamageCooldown;
+
+
     private Spawner spawner;
     private List<EnemyBehavior> enemies = new();
     private float enemySpawnCooldown;
 
-    public void Initialize(CameraManager cameraManager, PlayerBehavior player, float playerHitCooldown, Spawner spawner, float cooldown)
+
+    public void Initialize(CameraManager cameraManager, PlayerBehavior player, float playerDamageCooldown, Spawner spawner, float cooldown)
     {
         this.cameraManager = cameraManager;
         this.player = player;
-        this.playerHitCooldown = playerHitCooldown;
+        this.playerDamageCooldown = playerDamageCooldown;
         this.spawner = spawner;
         this.enemySpawnCooldown = cooldown;
 
@@ -81,8 +86,16 @@ public class GameManager : MonoBehaviour
         player.transform.position = playerPosition;
     }
 
-    public void PlayerHit()
+    public void PlayerHit(Collision collision)
     {
-
+        spawner.DeSpawn(collision.gameObject.GetComponent<EnemyBehavior>());
+        if (player.lifePoints >= 0)
+        {
+            player.LoseLife(playerDamageCooldown);
+        }
+        // else
+        // {
+        //     player.Die();
+        // }
     }
 }

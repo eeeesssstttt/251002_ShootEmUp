@@ -1,3 +1,5 @@
+using System.Collections;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -8,9 +10,14 @@ public class PlayerBehavior : MonoBehaviour
     private InputActionAsset actions;
     private InputAction xAxis;
     private InputAction yAxis;
+
     private GameManager manager;
+
     private Collider collider;
-    private int lifePoints;
+
+    public int lifePoints { get; private set; }
+    private bool isInvincible = false;
+
     private float velocity;
 
     public void Initialize(InputActionAsset actions, GameManager manager, Vector3 position, int lifePoints, float velocity)
@@ -62,9 +69,30 @@ public class PlayerBehavior : MonoBehaviour
         transform.position += yAxis.ReadValue<float>() * velocity * Time.deltaTime * Vector3.up;
     }
 
+    public void LoseLife(float cooldown = 0)
+    {
+        if (!isInvincible)
+        {
+            lifePoints -= 1;
+            Debug.Log("Death approaches...");
+            if (cooldown > 0)
+            {
+                StartCoroutine(DamageCooldown(cooldown));
+            }
+        }
+    }
+
+    public IEnumerator DamageCooldown(float cooldown)
+    {
+        isInvincible = true;
+        yield return new WaitForSeconds(cooldown);
+        isInvincible = false;
+    }
+
     public void Die()
     {
         gameObject.SetActive(false);
+        Debug.Log("DEATH!");
     }
 
     public void ResetPlayer(Vector3 position)
@@ -73,8 +101,10 @@ public class PlayerBehavior : MonoBehaviour
         gameObject.SetActive(true);
     }
 
-    private void OnCollisionEnter(Collision collision)
+
+    void OnCollisionEnter(Collision collision)
     {
-        manager.PlayerHit();
+        Debug.Log("Collision");
+        manager.PlayerHit(collision);
     }
 }

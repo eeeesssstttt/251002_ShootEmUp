@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 
+// Create UI element that generates canvas and displays images on it
 
 public class GameInitializer : MonoBehaviour
 {
@@ -10,8 +11,11 @@ public class GameInitializer : MonoBehaviour
     [SerializeField] private Quaternion camRotation;
     [SerializeField] private float cameraDistance = 20f;
 
+
+    [Space]
     [Header("Controls")]
     [SerializeField] private InputActionAsset actions;
+
 
     [Space]
     [Header("Spawner")]
@@ -20,12 +24,14 @@ public class GameInitializer : MonoBehaviour
     [SerializeField] private int batchNumber = 10;
     [SerializeField] private float enemySpawnCooldown = 0.1f;
 
+
     [Space]
     [Header("Player")]
     [SerializeField] private PlayerBehavior player;
     [SerializeField] private int lifePoints = 3;
     [SerializeField] private float playerHitCooldown = 1f;
     [SerializeField] private float velocity = 1f;
+
 
     [Space]
     [Header("Game Manager")]

@@ -6,6 +6,8 @@ public class Spawner : MonoBehaviour
     private Vector3 minPoint;
     private Vector3 maxPoint;
     private Pool<EnemyBehavior> pool;
+
+
     public void Initialize(EnemyBehavior enemy, Vector3 minPoint, Vector3 maxPoint, int batchNumber)
     {
         this.minPoint = minPoint;
