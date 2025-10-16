@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class GameManager : MonoBehaviour
 {
+    private UIManager uIManager;
+
     private CameraManager cameraManager;
     private float screenLeft;
     private float screenRight;
@@ -22,8 +24,9 @@ public class GameManager : MonoBehaviour
     private float enemySpawnCooldown;
 
 
-    public void Initialize(CameraManager cameraManager, PlayerBehavior player, float playerDamageCooldown, Spawner spawner, float cooldown)
+    public void Initialize(UIManager uIManager, CameraManager cameraManager, PlayerBehavior player, float playerDamageCooldown, Spawner spawner, float cooldown)
     {
+        this.uIManager = uIManager;
         this.cameraManager = cameraManager;
         this.player = player;
         this.playerDamageCooldown = playerDamageCooldown;
@@ -97,5 +100,10 @@ public class GameManager : MonoBehaviour
         // {
         //     player.Die();
         // }
+    }
+
+    public int GetPlayerLives()
+    {
+        return player.GetLives();
     }
 }

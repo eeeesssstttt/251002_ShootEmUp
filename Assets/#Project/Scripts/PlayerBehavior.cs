@@ -58,6 +58,11 @@ public class PlayerBehavior : MonoBehaviour
         return collider.bounds.extents;
     }
 
+    public int GetLives()
+    {
+        return lifePoints;
+    }
+
     private void SetPosition(Vector3 position)
     {
         transform.position = position;

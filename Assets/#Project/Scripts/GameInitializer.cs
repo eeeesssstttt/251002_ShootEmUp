@@ -37,6 +37,11 @@ public class GameInitializer : MonoBehaviour
     [Header("Game Manager")]
     [SerializeField] private GameManager gameManager;
 
+    [Space]
+    [Header("UI")]
+    [SerializeField] UIManager uIManager;
+    [SerializeField] CanvasRenderer lifeSprite;
+
 
     void Start()
     {
@@ -51,6 +56,7 @@ public class GameInitializer : MonoBehaviour
         player = Instantiate(player);
         spawner = Instantiate(spawner);
         gameManager = Instantiate(gameManager);
+        uIManager = Instantiate(uIManager);
     }
 
     private void InitializeObjects()
@@ -59,6 +65,7 @@ public class GameInitializer : MonoBehaviour
         (Vector3 min, Vector3 max) = cameraManager.GetRightBorderPoints();
         player.Initialize(actions, gameManager, cameraManager.GetCenter(), lifePoints, velocity);
         spawner.Initialize(enemyPrefab, min, max, batchNumber);
-        gameManager.Initialize(cameraManager, player, playerHitCooldown, spawner, enemySpawnCooldown);
+        gameManager.Initialize(uIManager, cameraManager, player, playerHitCooldown, spawner, enemySpawnCooldown);
+        uIManager.Initialize(gameManager, lifeSprite);
     }
 }
