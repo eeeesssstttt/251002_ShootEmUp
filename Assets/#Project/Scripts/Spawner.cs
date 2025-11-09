@@ -1,30 +1,27 @@
-using System.Collections;
 using UnityEngine;
 
 public class Spawner : MonoBehaviour
 {
-    private Vector3 minPoint;
-    private Vector3 maxPoint;
+    private Vector3 spawnAreaBottom;
+    private Vector3 spawnAreaTop;
     private Pool<EnemyBehavior> pool;
 
 
-    public void Initialize(EnemyBehavior enemy, Vector3 minPoint, Vector3 maxPoint, int batchNumber)
+    public void Initialize(EnemyBehavior enemy, Vector3 spawnAreaBottom, Vector3 spawnAreaTop, int batchSize)
     {
-        this.minPoint = minPoint;
-        this.maxPoint = maxPoint;
+        this.spawnAreaBottom = spawnAreaBottom;
+        this.spawnAreaTop = spawnAreaTop;
 
-        pool = new(enemy.gameObject, batchNumber);
-
-        gameObject.SetActive(true);
+        pool = new(enemy.gameObject, batchSize);
     }
 
     public EnemyBehavior Spawn()
     {
-        float rnd = Random.Range(0f, 1f);
-        return pool.Get(Vector3.Lerp(minPoint, maxPoint, rnd), Quaternion.identity);
+        float t = Random.Range(0f, 1f);
+        return pool.Get(Vector3.Lerp(spawnAreaBottom, spawnAreaTop, t), Quaternion.identity);
     }
 
-    public void DeSpawn(EnemyBehavior enemy)
+    public void Despawn(EnemyBehavior enemy)
     {
         pool.Add(enemy);
     }

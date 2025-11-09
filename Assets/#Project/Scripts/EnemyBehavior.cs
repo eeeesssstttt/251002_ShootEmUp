@@ -6,7 +6,7 @@ public class EnemyBehavior : MonoBehaviour, IPoolClient
     [SerializeField] Vector3 speed = Vector3.left * 10f;
 
     private GameManager manager;
-    public void Rise(Vector3 position, Quaternion rotation)
+    public void Appear(Vector3 position, Quaternion rotation)
     {
         gameObject.SetActive(true);
         transform.SetLocalPositionAndRotation(position, rotation);
@@ -16,7 +16,7 @@ public class EnemyBehavior : MonoBehaviour, IPoolClient
     {
         this.manager = manager;
     }
-    public void Fall()
+    public void Disappear()
     {
         gameObject.SetActive(false);
     }
@@ -29,6 +29,6 @@ public class EnemyBehavior : MonoBehaviour, IPoolClient
 
     void OnBecameInvisible()
     {
-        manager.EnemyOffScreen(this);
+        manager.EnemyDestroy(this);
     }
 }

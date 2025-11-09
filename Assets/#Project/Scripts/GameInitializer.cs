@@ -1,7 +1,6 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
-
-// Create UI element that generates canvas and displays images on it
+using UnityEngine.UI;
 
 public class GameInitializer : MonoBehaviour
 {
@@ -15,38 +14,50 @@ public class GameInitializer : MonoBehaviour
     [Space]
     [Header("Controls")]
     [SerializeField] private InputActionAsset actions;
+    [SerializeField] private string actionMapName;
+    [SerializeField] private string moveActionName;
+    [SerializeField] private string targetActionName;
+    [SerializeField] private string shootActionName;
 
 
     [Space]
     [Header("Spawner")]
     [SerializeField] private Spawner spawner;
     [SerializeField] private EnemyBehavior enemyPrefab;
-    [SerializeField] private int batchNumber = 10;
-    [SerializeField] private float enemySpawnCooldown = 0.1f;
-
-
-    [Space]
-    [Header("Player")]
-    [SerializeField] private PlayerBehavior player;
-    [SerializeField] private int lifePoints = 3;
-    [SerializeField] private float playerHitCooldown = 1f;
-    [SerializeField] private float velocity = 1f;
+    [SerializeField] private int batchSize = 10;
+    [SerializeField] private float cooldown = 0.1f;
 
 
     [Space]
     [Header("Game Manager")]
     [SerializeField] private GameManager gameManager;
 
+
+    [Space]
+    [Header("Player")]
+    [SerializeField] private PlayerController player;
+    [SerializeField] private int startingLives = 3;
+    [SerializeField] float speed = 5f;
+
+
+    [Space]
+    [Header("Bullets")]
+    [SerializeField] BulletBehavior defaultBullet;
+
+
     [Space]
     [Header("UI")]
-    [SerializeField] UIManager uIManager;
-    [SerializeField] CanvasRenderer lifeSprite;
+    [SerializeField] private LifeDisplay lifeDisplay;
+    [SerializeField] private Image lifeImage;
+    [SerializeField] private Vector2 _1stImagePosition;
+    [SerializeField] private Vector2 offset;
 
 
     void Start()
     {
         CreateObjects();
         InitializeObjects();
+        // After creating all necessary elements, the GameInitializer self-destructs.
         Destroy(gameObject);
     }
 
@@ -56,16 +67,22 @@ public class GameInitializer : MonoBehaviour
         player = Instantiate(player);
         spawner = Instantiate(spawner);
         gameManager = Instantiate(gameManager);
-        uIManager = Instantiate(uIManager);
+        lifeDisplay = Instantiate(lifeDisplay);
     }
 
     private void InitializeObjects()
     {
         cameraManager.Initialize(camPosition, camRotation, cameraDistance);
-        (Vector3 min, Vector3 max) = cameraManager.GetRightBorderPoints();
-        player.Initialize(actions, gameManager, cameraManager.GetCenter(), lifePoints, velocity);
-        spawner.Initialize(enemyPrefab, min, max, batchNumber);
-        gameManager.Initialize(uIManager, cameraManager, player, playerHitCooldown, spawner, enemySpawnCooldown);
-        uIManager.Initialize(gameManager, lifeSprite);
+        (Vector3 screenBottomRight, Vector3 screenTopRight) = cameraManager.GetRightBorderPoints();
+        spawner.Initialize(enemyPrefab, screenBottomRight, screenTopRight, batchSize);
+
+
+        player.Initialize(cameraManager.GetCenter(), cameraManager.Cam, cameraDistance, Quaternion.identity, speed, actions, actionMapName, moveActionName, targetActionName, shootActionName, defaultBullet, gameManager);
+        player.gameObject.SetActive(true);
+
+        player.GetComponent<PlayerCollisionInfo>().Initialize(gameManager);
+
+        gameManager.Initialize(spawner, cooldown, player, startingLives, lifeDisplay);
+        lifeDisplay.Initialize(lifeImage, startingLives, _1stImagePosition, offset);
     }
 }

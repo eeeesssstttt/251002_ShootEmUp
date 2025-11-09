@@ -1,75 +1,34 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class GameManager : MonoBehaviour
 {
-    private UIManager uIManager;
-
-    private CameraManager cameraManager;
-    private float screenLeft;
-    private float screenRight;
-    private float screenBottom;
-    private float screenTop;
-
-
-    private PlayerBehavior player;
-    private float playerHalfExtentX;
-    private float playerHalfExtentY;
-    private float playerDamageCooldown;
-
-
     private Spawner spawner;
+    private PlayerController player;
     private List<EnemyBehavior> enemies = new();
-    private float enemySpawnCooldown;
+    private List<BulletBehavior> bullets = new();
+    private float cooldown;
+    private float timer = 0f;
 
+    private int playerLives;
 
-    public void Initialize(UIManager uIManager, CameraManager cameraManager, PlayerBehavior player, float playerDamageCooldown, Spawner spawner, float cooldown)
+    private LifeDisplay lifeDisplay;
+
+    public void Initialize(Spawner spawner, float cooldown, PlayerController player, int startingLives, LifeDisplay lifeDisplay)
     {
-        this.uIManager = uIManager;
-        this.cameraManager = cameraManager;
-        this.player = player;
-        this.playerDamageCooldown = playerDamageCooldown;
         this.spawner = spawner;
-        this.enemySpawnCooldown = cooldown;
-
-        screenLeft = cameraManager.GetLeft();
-        screenRight = cameraManager.GetRight();
-        screenBottom = cameraManager.GetBottom();
-        screenTop = cameraManager.GetTop();
-
-        playerHalfExtentX = player.GetExtents()[0];
-        playerHalfExtentY = player.GetExtents()[1];
-
-        gameObject.SetActive(true);
-
-        StartCoroutine(SpawnEnemies());
+        this.cooldown = cooldown;
+        this.player = player;
+        playerLives = startingLives;
+        this.lifeDisplay = lifeDisplay;
     }
 
     private void Update()
     {
-        for (int index = 0; index < enemies.Count; index++)
+        timer += Time.deltaTime;
+        if (timer >= cooldown)
         {
-            enemies[index].Process();
-        }
-
-        if (player.enabled)
-        {
-            player.Process();
-            KeepPlayerOnScreen();
-        }
-    }
-
-    public void EnemyOffScreen(EnemyBehavior enemy)
-    {
-        spawner.DeSpawn(enemy);
-    }
-
-    private IEnumerator SpawnEnemies()
-    {
-        while (true)
-        {
-            yield return new WaitForSeconds(enemySpawnCooldown);
+            timer = 0f;
             EnemyBehavior enemy = spawner.Spawn();
             if (!enemies.Contains(enemy))
             {
@@ -77,33 +36,43 @@ public class GameManager : MonoBehaviour
                 enemy.Initialize(this);
             }
         }
-    }
 
-    private void KeepPlayerOnScreen()
-    {
-        Vector3 playerPosition = player.transform.position;
-
-        playerPosition.x = Mathf.Clamp(playerPosition.x, screenLeft + playerHalfExtentX, screenRight - playerHalfExtentX);
-        playerPosition.y = Mathf.Clamp(playerPosition.y, screenBottom + playerHalfExtentY, screenTop - playerHalfExtentY);
-
-        player.transform.position = playerPosition;
-    }
-
-    public void PlayerHit(Collision collision)
-    {
-        spawner.DeSpawn(collision.gameObject.GetComponent<EnemyBehavior>());
-        if (player.lifePoints >= 0)
+        for (int index = 0; index < enemies.Count; index++)
         {
-            player.LoseLife(playerDamageCooldown);
+            enemies[index].Process();
         }
-        // else
-        // {
-        //     player.Die();
-        // }
+
+        for (int index = 0; index < bullets.Count; index++)
+        {
+            bullets[index].Process();
+        }
+
+        player.Process();
     }
 
-    public int GetPlayerLives()
+    public void AddBullet(BulletBehavior bullet)
     {
-        return player.GetLives();
+        bullets.Add(bullet);
+    }
+
+    public void BulletDestroy(BulletBehavior bullet)
+    {
+        bullets.Remove(bullet);
+        Destroy(bullet.gameObject);
+    }
+
+    public void EnemyDestroy(EnemyBehavior enemy)
+    {
+        spawner.Despawn(enemy);
+    }
+
+    public void PlayerContact(GameObject other)
+    {
+        if (other.TryGetComponent(out EnemyBehavior enemy))
+        {
+            playerLives -= 1;
+            if (playerLives >= 0) lifeDisplay.UpdateDisplay(playerLives);
+            EnemyDestroy(enemy);
+        }
     }
 }

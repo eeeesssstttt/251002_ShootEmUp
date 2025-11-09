@@ -49,10 +49,20 @@ MonoBehaviour:
   camRotation: {x: 0, y: 0, z: 0, w: 0}
   cameraDistance: 20
   actions: {fileID: -944628639613478452, guid: 7577ae6e808a6104f842ba7525036a10, type: 3}
+  actionMapName: PlayerControls
+  moveActionName: Move
+  targetActionName: Target
+  shootActionName: Shoot
   spawner: {fileID: 1389250101968221411, guid: 6d79de3300c507140ac3c151754a7bd8, type: 3}
-  enemyPrefab: {fileID: 5998481921579256087, guid: 038a04cf2b0ec3e4b91007e657aec4b0, type: 3}
-  batchNumber: 10
+  enemyPrefab: {fileID: 4290183208657812998, guid: 038a04cf2b0ec3e4b91007e657aec4b0, type: 3}
+  batchSize: 10
   cooldown: 0.1
-  player: {fileID: 1049109099146983418, guid: 69d6926b2e8e78543bad6c50f8bc1e6a, type: 3}
-  velocity: 1
   gameManager: {fileID: 1301237844255271627, guid: ed3e3489881646a40bd0482cebbb3aac, type: 3}
+  player: {fileID: -6520782470814392872, guid: 69d6926b2e8e78543bad6c50f8bc1e6a, type: 3}
+  startingLives: 3
+  speed: 12
+  defaultBullet: {fileID: 4893603686486553984, guid: f68f6678b98c68447af1b9c8096e7e3b, type: 3}
+  lifeDisplay: {fileID: 1397449087190274624, guid: 74e60ebe18663a5439c8f574ae67e2a1, type: 3}
+  lifeImage: {fileID: 5306739571776002358, guid: d1a87b2c755682f4fb20b6cce62d7f66, type: 3}
+  _1stImagePosition: {x: 0, y: -10}
+  offset: {x: -60, y: 0}

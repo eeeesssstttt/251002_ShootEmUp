@@ -5,24 +5,24 @@ public class Pool<T>
 where T : IPoolClient
 {
     private GameObject prefab;
-    private int batchNumber;
+    private int batchSize;
     private Queue<T> queue = new();
-    public Pool(GameObject prefab, int batchNumber)
+    public Pool(GameObject prefab, int batchSize)
     {
         if (prefab.GetComponent<IPoolClient>() == null)
         {
-            throw new System.ArgumentException("Prefab doesn't have a componenent that have implement IPoolClient");
+            throw new System.ArgumentException("Missing IPoolClient component.");
         }
 
         this.prefab = prefab;
-        this.batchNumber = batchNumber;
+        this.batchSize = batchSize;
 
         CreateBatch();
     }
 
     private void CreateBatch()
     {
-        for (int _ = 0; _ < batchNumber; _++)
+        for (int _ = 0; _ < batchSize; _++)
         {
             GameObject go = Object.Instantiate(prefab);
             T client = go.GetComponent<T>();
@@ -34,13 +34,13 @@ where T : IPoolClient
     {
         if (queue.Count == 0) CreateBatch();
         T client = queue.Dequeue();
-        client.Rise(position, rotation);
+        client.Appear(position, rotation);
         return client;
     }
 
     public void Add(T client)
     {
         queue.Enqueue(client);
-        client.Fall();
+        client.Disappear();
     }
 }
